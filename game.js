@@ -8,6 +8,7 @@ let upgrades = [
 
 const scoreRef = document.querySelector("#score-display");
 const rateRef = document.querySelector("#rate-display");
+const upgradesRef = document.querySelector("#upgrades");
 const button = document.querySelector("#click-btn");
 
 function updateDisplay() {
@@ -15,7 +16,25 @@ function updateDisplay() {
 	rateRef.textContent = `Points per click: ${pointsPerClick}`;
 }
 
+function buyUpgrade(id) {}
+
+function renderUpgrades() {
+	upgradesRef.innerHTML = "";
+	upgrades.forEach((el) => {
+		let div = document.createElement("div");
+		let btn = document.createElement("button");
+		btn.textContent = "Buy";
+		btn.onclick = buyUpgrade(el.id);
+		div.innerHTML = `<p>Name: ${el.name}, Cost: ${el.cost}, Bonus: ${el.bonus}</p>`;
+		div.style = "display:flex; align-items: center; gap: 1rem;";
+		div.appendChild(btn);
+		upgradesRef.appendChild(div);
+	});
+}
+
 button.addEventListener("click", function () {
 	score = score + pointsPerClick;
 	updateDisplay();
 });
+
+renderUpgrades();
