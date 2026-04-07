@@ -17,33 +17,42 @@ function updateDisplay() {
 }
 
 function buyUpgrade(id) {
-    console.log(id);
-    const found = upgrades.find(fid => fid.id == id);
-    console.log(found);
-    if(score >= found.cost) { 
-        score = score - found.cost;
-        pointsPerClick = pointsPerClick + found.bonus;
-        updateDisplay();
-        renderUpgrades();
-    }
+	console.log(id);
+	const found = upgrades.find((fid) => fid.id == id);
+	console.log(found);
+	if (score >= found.cost) {
+		score = score - found.cost;
+		pointsPerClick = pointsPerClick + found.bonus;
+		updateDisplay();
+		renderUpgrades();
+	}
 }
 
 function renderUpgrades() {
 	upgradesRef.innerHTML = "";
 	upgrades.forEach((el) => {
 		let div = document.createElement("div");
-        div.innerHTML = `
-            <strong>${el.name}</strong>
-             Cost: ${el.cost} | +${el.bonus} per click
-            <button onclick="buyUpgrade(${el.id})">Buy</button>
-            `;
-        upgradesRef.appendChild(div);
+		let buyBtn = document.createElement("button");
+		div.innerHTML = `<strong>${el.name}</strong>Cost: ${el.cost} | +${el.bonus} per click`;
+		buyBtn.textContent = "Buy";
+		const found = upgrades.find((fid) => fid.id == el.id);
+		if (found.cost > score) {
+			buyBtn.disabled = true;
+		} else {
+			buyBtn.disabled = false;
+		}
+		buyBtn.addEventListener("click", () => {
+			buyUpgrade(el.id);
+		});
+		div.appendChild(buyBtn);
+		upgradesRef.appendChild(div);
 	});
 }
 
 button.addEventListener("click", function () {
 	score = score + pointsPerClick;
 	updateDisplay();
+	renderUpgrades();
 });
 
 renderUpgrades();
