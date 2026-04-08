@@ -3,28 +3,51 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>clicker-game</title>
+		<title>Clicker Survival</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
 		<link rel="stylesheet" href="styles.css" />
 	</head>
-	<body>
-		<h1>Clicker Survival</h1>
-		<p id="health-display">Health: 100</p>
-		<p id="score-display">Score: 0</p>
-		<p id="rate-display">Points per click: 1</p>
-		<button id="click-btn">Click</button>
 
-		<h1>Inventory</h1>
-		<div id="inventory">
-			<img id="green-herb" class="herb" src="images/green_herb.png" />
-			<img id="yellow-herb" class="herb" src="images/yellow_herb.png" />
-			<img id="red-herb" class="herb" src="images/red_herb.png" />
+	<body>
+		<div id="app-container">
+			<h1>Clicker Survival</h1>
+
+			<div id="health-container">
+				<div id="health-bar"></div>
+				<div id="health-display">100</div>
+			</div>
+
+			<p id="score-display">Score: 0</p>
+			<p id="rate-display">Points per click: 1</p>
+
+			<button id="click-btn">Click!</button>
+
+			<h1>Inventory</h1>
+			<div id="inventory">
+				<div class="herb-slot">
+					<img id="green-herb" class="herb" src="images/green_herb.png" />
+					<span class="counter" id="green-count">0</span>
+				</div>
+				<div class="herb-slot">
+					<img id="yellow-herb" class="herb" src="images/yellow_herb.png" />
+					<span class="counter" id="yellow-count">0</span>
+				</div>
+				<div class="herb-slot">
+					<img id="red-herb" class="herb" src="images/red_herb.png" />
+					<span class="counter" id="red-count">0</span>
+				</div>
+			</div>
+
+			<h1>Mixer</h1>
+			<div id="mixer-container">
+				<div id="mixer"></div>
+				<button id="mix-btn">Mix Herbs</button>
+			</div>
 		</div>
 
-		<h1>Mixer Table</h1>
-		<section>
-			<div id="mixer"></div>
-			<button id="mix-btn">Mix Herbs</button>
-		</section>
-		<script src="game.js"></script>
+		<script src="/game.js"></script>
 	</body>
 </html>

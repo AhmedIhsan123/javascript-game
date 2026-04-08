@@ -4,12 +4,6 @@ let pointsPerClick = 1;
 let health = 100;
 let maxHealth = 100;
 
-// let upgrades = [
-// 	{ id: 1, name: "+2 Upgrade", cost: 10, bonus: 2 },
-// 	{ id: 2, name: "+4 Upgrade", cost: 20, bonus: 4 },
-// 	{ id: 3, name: "+8 Upgrade", cost: 40, bonus: 8 },
-// ];
-
 let inventory = [
 	{ id: "green", name: "Green Herb", amount: 0 },
 	{ id: "red", name: "Red Herb", amount: 0 },
@@ -25,7 +19,7 @@ const validMixes = [
 	// Two-herb combinations
 	{ combo: ["Red Herb", "Green Herb"], effect: { health: 100 } },
 	{ combo: ["Green Herb", "Yellow Herb"], effect: { health: 50 } },
-	{ combo: ["Red Herb", "Green Herb"], effect: { health: 30 } },
+	{ combo: ["Green Herb", "Green Herb"], effect: { health: 30 } },
 
 	// Three-herb combinations
 	{ combo: ["Red Herb", "Green Herb", "Yellow Herb"], effect: { health: 150 } },
@@ -37,6 +31,7 @@ const validMixes = [
 
 // DOM references
 const healthRef = document.querySelector("#health-display");
+const healthBarRef = document.querySelector("#health-bar");
 const scoreRef = document.querySelector("#score-display");
 const rateRef = document.querySelector("#rate-display");
 const clickButton = document.querySelector("#click-btn");
@@ -44,49 +39,39 @@ const herbsRef = document.querySelectorAll(".herb");
 const mixerRef = document.querySelector("#mixer");
 const mixBtnRef = document.querySelector("#mix-btn");
 
-// Health decay
-const updateHealth = setInterval(() => {
-	health--;
-	if (health < 0) health = 0;
-	healthRef.textContent = `Health: ${health}`;
-	if (health === 0) clearInterval(updateHealth);
-}, 1000);
-
-// Update score and rate display
+// --- Central display update ---
 function updateDisplay() {
+	// Score & click rate
 	scoreRef.textContent = `Score: ${score}`;
 	rateRef.textContent = `Points per click: ${pointsPerClick}`;
+
+	// Health text
 	healthRef.textContent = `Health: ${health}`;
+
+	// Health bar width
+	healthBarRef.style.width = `${(health / maxHealth) * 100}%`;
 }
 
-// Handle upgrades (optional, uncomment renderUpgrades if using in UI)
-/*
-function buyUpgrade(id) {
-  const found = upgrades.find((u) => u.id == id);
-  if (score >= found.cost) {
-    score -= found.cost;
-    pointsPerClick += found.bonus;
-    updateDisplay();
-    renderUpgrades();
-  }
+// --- Health modifier helper ---
+function changeHealth(amount) {
+	health += amount;
+	if (health > maxHealth) health = maxHealth;
+	if (health < 0) health = 0;
+	updateDisplay();
 }
 
-function renderUpgrades() {
-  upgradesRef.innerHTML = "";
-  upgrades.forEach((el) => {
-    let div = document.createElement("div");
-    let buyBtn = document.createElement("button");
-    div.innerHTML = `<strong>${el.name}</strong> Cost: ${el.cost} | +${el.bonus} per click `;
-    buyBtn.textContent = "Buy";
-    buyBtn.disabled = el.cost > score;
-    buyBtn.addEventListener("click", () => buyUpgrade(el.id));
-    div.appendChild(buyBtn);
-    upgradesRef.appendChild(div);
-  });
-}
-*/
+// --- Health decay timer ---
+const healthDecay = setInterval(() => {
+	changeHealth(-1); // decrease by 1 per second
+	if (health === 0) clearInterval(healthDecay);
+}, 1000);
 
-// Handle herb clicks
+// --- Click to heal ---
+clickButton.addEventListener("click", () => {
+	changeHealth(pointsPerClick);
+});
+
+// --- Handle herb clicks ---
 function handleHerbClicked(hId) {
 	switch (hId) {
 		case "green-herb":
@@ -104,7 +89,7 @@ function handleHerbClicked(hId) {
 	}
 }
 
-// Add herb to mixer
+// --- Add herb to mixer ---
 function addToMixer(herbName) {
 	if (mixerCounter >= 3) return; // Limit 3 herbs in mixer
 
@@ -124,34 +109,26 @@ function addToMixer(herbName) {
 	mixerCounter++;
 }
 
-// Mix herbs to gain effects
+// --- Mix herbs ---
 function mixHerbs() {
-	if (mixerCounter < 2) {
-		alert("Add at least 2 herbs to mix!");
+	if (mixerCounter < 1) {
+		alert("Add at least 1 herb to mix!");
 		return;
 	}
 
-	// Get the herb names from the mixer
 	const herbElements = [...mixerRef.querySelectorAll("p")].map(
 		(el) => el.textContent,
 	);
-
-	// Count herbs
 	const herbCounts = {};
 	herbElements.forEach((h) => (herbCounts[h] = (herbCounts[h] || 0) + 1));
 
-	// Find a valid mix
 	const matchedMix = validMixes.find((mix) => {
 		if (!mix || !mix.combo) return false;
-
 		const mixCounts = {};
 		mix.combo.forEach((h) => (mixCounts[h] = (mixCounts[h] || 0) + 1));
-
-		// Check counts match exactly
 		for (const h in mixCounts) if (herbCounts[h] !== mixCounts[h]) return false;
 		for (const h in herbCounts)
 			if (mixCounts[h] !== herbCounts[h]) return false;
-
 		return true;
 	});
 
@@ -162,32 +139,26 @@ function mixHerbs() {
 		return;
 	}
 
-	// Apply effect
-	health += matchedMix.effect.health;
-	if (herbElements.includes("Yellow Herb")) {
-		maxHealth += 20; // Increase max health if yellow is present
-		alert("Yellow herb included! Max health increased by 20.");
-	}
+	// Apply effect using changeHealth
+	changeHealth(matchedMix.effect.health);
 
-	if (health > maxHealth) health = maxHealth;
+	// Special yellow herb max health boost
+	if (herbElements.includes("Yellow Herb")) {
+		maxHealth += 20;
+		alert("Yellow herb included! Max health increased by 20.");
+		updateDisplay(); // update bar after maxHealth increase
+	}
 
 	alert(`Successful mix! Health +${matchedMix.effect.health}`);
 	mixerRef.innerHTML = "";
 	mixerCounter = 0;
-	updateDisplay();
 }
 
-// Event listeners
-clickButton.addEventListener("click", () => {
-	health = Math.min(health + pointsPerClick, maxHealth);
-	updateDisplay();
-});
-
-herbsRef.forEach((herb) => {
-	herb.addEventListener("click", () => handleHerbClicked(herb.id));
-});
-
+// --- Event listeners ---
+herbsRef.forEach((herb) =>
+	herb.addEventListener("click", () => handleHerbClicked(herb.id)),
+);
 mixBtnRef.addEventListener("click", () => mixHerbs());
 
-// Initial display update
+// --- Initial display ---
 updateDisplay();
