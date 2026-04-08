@@ -21,16 +21,18 @@ let mixerCounter = 0;
 const validMixes = [
 	// Single herbs
 	{ combo: ["Green Herb"], effect: { health: 10 } },
-	{ combo: ["Yellow Herb"], effect: { health: 30 } },
-	{ combo: ["Red Herb"], effect: { health: 50 } },
 
 	// Two-herb combinations
 	{ combo: ["Red Herb", "Green Herb"], effect: { health: 100 } },
 	{ combo: ["Green Herb", "Yellow Herb"], effect: { health: 50 } },
-	{ combo: ["Red Herb", "Yellow Herb"], effect: { health: 70 } },
+	{ combo: ["Red Herb", "Green Herb"], effect: { health: 30 } },
 
 	// Three-herb combinations
 	{ combo: ["Red Herb", "Green Herb", "Yellow Herb"], effect: { health: 150 } },
+	{
+		combo: ["Green Herb", "Green Herb", "Green Herb"],
+		effect: { health: maxHealth - 10 },
+	},
 ];
 
 // DOM references
